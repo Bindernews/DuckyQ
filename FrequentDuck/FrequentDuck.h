@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IPlug_include_in_plug_hdr.h"
+#include "BlockSizeFixer.h"
 #include "fft.h"
 
 const int kNumPresets = 1;
@@ -35,14 +36,9 @@ public:
 
 #if IPLUG_DSP // http://bit.ly/2S64BDd
     void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
-    void ProcessFFT();
+    void ProcessFFT(sample** inputs, sample** outputs, int nFrames);
 
-    WDL_TypedBuf<WDL_FFT_COMPLEX> m_fftBuf[kNumFFTBuffers];
-    WDL_TypedBuf<sample> m_outputBuf[MAX_OUTPUT_CHANS];
-    int m_fftPos;
-    /** Index in m_outputBuf corresponding to index 0 in outputs */
-    int m_outPos;
-
-    int m_latency;
+    WDL_TypedBuf<WDL_FFT_COMPLEX> m_fftBuf[MAX_INPUT_CHANS];
+    BlockSizeFixer m_blockFixer;
 #endif
 };

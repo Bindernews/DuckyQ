@@ -146,7 +146,7 @@
     <ClCompile Include="..\..\iPlug2\WDL\fft.c">
       <Filter>IPlug</Filter>
     </ClCompile>
-    <ClCompile Include="BlockSizeFixer.cpp" />
+    <ClCompile Include="..\BlockSizeFixer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="../config.h" />
@@ -388,7 +388,7 @@
     <ClInclude Include="..\..\iPlug2\IGraphics\ISender.h">
       <Filter>IGraphics</Filter>
     </ClInclude>
-    <ClInclude Include="BlockSizeFixer.h" />
+    <ClInclude Include="..\BlockSizeFixer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">

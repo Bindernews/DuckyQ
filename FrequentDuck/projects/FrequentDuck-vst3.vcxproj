@@ -338,9 +338,9 @@
     <ClInclude Include="..\..\iPlug2\IPlug\VST3\IPlugVST3_Parameter.h" />
     <ClInclude Include="..\..\iPlug2\IPlug\VST3\IPlugVST3_ProcessorBase.h" />
     <ClInclude Include="..\..\iPlug2\IPlug\VST3\IPlugVST3_View.h" />
+    <ClInclude Include="..\BlockSizeFixer.h" />
     <ClInclude Include="..\FrequentDuck.h" />
     <ClInclude Include="..\resources\resource.h" />
-    <ClInclude Include="BlockSizeFixer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(VST3_SDK)\base\source\baseiids.cpp" />
@@ -426,8 +426,8 @@
     <ClCompile Include="..\..\iPlug2\IPlug\VST3\IPlugVST3.cpp" />
     <ClCompile Include="..\..\iPlug2\IPlug\VST3\IPlugVST3_ProcessorBase.cpp" />
     <ClCompile Include="..\..\iPlug2\WDL\fft.c" />
+    <ClCompile Include="..\BlockSizeFixer.cpp" />
     <ClCompile Include="..\FrequentDuck.cpp" />
-    <ClCompile Include="BlockSizeFixer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\resources\main.rc" />
