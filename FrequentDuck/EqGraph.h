@@ -14,12 +14,15 @@ class EqGraph : public IControl,
                 public IVectorBase
 {
 public:
+    static const int MIN_HZ = 20;
+    static const int MAX_HZ = 22000;
+
     EqGraph(const IRECT& bounds, const IVStyle& style = DEFAULT_STYLE)
         : IControl(bounds, SplashClickActionFunc), IVectorBase(style)
     {
         AttachIControl(this, "");
         mWidgetBounds = mRECT;
-        m_sampleRate = 42000;
+        m_sampleRate = 48000;
         mStyle.labelText.mSize = 12.f;
         mStyle.labelText.mAlign = EAlign::Near;
     }
@@ -46,7 +49,13 @@ public:
         const float minY = powf(10, (-500.f / 20.f * 2.f));
         const double wsc = b.W() / logf(401.f);
         const double sc = (b.H() - 20) * 20 / (-slider2 * logf(10));
-        const float xscale = 1.0f;
+        const float xscale = 1.f;
+
+        // hz = i * sample_rate / fft_size
+        // https://stackoverflow.com/questions/4364823/how-do-i-obtain-the-frequencies-of-each-value-in-an-fft
+        const float hzMul = m_sampleRate / BUFSIZE;
+        // Float-version of BUFSIZE
+        const float bufsizef = (float)BUFSIZE;
 
         // For each channel, draw a line for the frequency
         for (int c = 0; c < m_buf.nChans; c++) {
@@ -56,12 +65,13 @@ public:
             for (int i = 0; i < BUFSIZE; i++) {
                 float ty = logf(std::max(sqr(buf[0]) + sqr(buf[1]), minY));
                 buf += 2;
-                //float ty = logf(std::max(sqr(buf[0]), minY));
-                //buf += 1;
+
+                float hz = (float)i * hzMul;
 
                 ty = ty * -0.5 * sc + 20;
                 ty = std::min(ty, b.H());
-                float tx = logf(1.f + i * xscale) * wsc;
+                float tx = logf(1.f + i) * wsc;
+                //float tx = Lerp(b.L, b.R, (float)i / bufsizef);
 
                 g.PathLineTo(tx + b.L, b.T + ty);
             }
@@ -84,7 +94,7 @@ public:
         g.MeasureText(mStyle.labelText, "TESHz", textSize);
         IRECT tmpR;
 
-        double wsc = b.R / logf(401.f);
+        double wsc = b.W() / logf(401.f);
         double f = 20;
         double lx = mWidgetBounds.L;
         float nextTextX = b.L + textSize.W();
