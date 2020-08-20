@@ -147,6 +147,7 @@
       <Filter>IPlug</Filter>
     </ClCompile>
     <ClCompile Include="..\BlockSizeFixer.cpp" />
+    <ClCompile Include="..\EqGraph.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="../config.h" />
@@ -389,6 +390,7 @@
       <Filter>IGraphics</Filter>
     </ClInclude>
     <ClInclude Include="..\BlockSizeFixer.h" />
+    <ClInclude Include="..\EqGraph.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">

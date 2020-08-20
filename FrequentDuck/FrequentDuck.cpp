@@ -1,6 +1,7 @@
 #include "FrequentDuck.h"
 #include "IPlug_include_in_plug_src.h"
 #include "IControls.h"
+#include "EqGraph.h"
 
 #define ZERO_WDL_BUF(buf, type_size) memset((buf).Get(), 0, (buf).GetSize() * (type_size))
 
@@ -22,7 +23,7 @@ FrequentDuck::FrequentDuck(const InstanceInfo& info)
     WDL_fft_init();
 
     // Resize our buffers.
-    for (int i = 0; i < kNumFFTBuffers; i++) {
+    for (int i = 0; i < MAX_INPUT_CHANS; i++) {
         m_fftBuf[i].Resize(FFT_BLOCK_SIZE);
     }
 
@@ -47,7 +48,7 @@ void FrequentDuck::buildGui(IGraphics& ui)
 void FrequentDuck::OnReset()
 {
 #if IPLUG_DSP
-    for (int i = 0; i < kNumFFTBuffers; i++) {
+    for (int i = 0; i < MAX_INPUT_CHANS; i++) {
         ZERO_WDL_BUF(m_fftBuf[i], sizeof(WDL_FFT_COMPLEX));
     }
     m_blockFixer.reset();

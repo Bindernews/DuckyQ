@@ -17,7 +17,7 @@
 
 #define PLUG_CHANNEL_IO "1.1-1 2.2-2"
 
-#define PLUG_LATENCY 1024
+#define PLUG_LATENCY 512
 #define PLUG_TYPE 0
 #define PLUG_DOES_MIDI_IN 0
 #define PLUG_DOES_MIDI_OUT 0
@@ -52,3 +52,9 @@
 #define APP_SIGNAL_VECTOR_SIZE 64
 
 #define ROBOTO_FN "Roboto-Regular.ttf"
+
+// User-defined configs. Unrelated to iPlug
+
+#define FFT_BLOCK_SIZE (1024)
+#define MAX_INPUT_CHANS (4)
+#define MAX_OUTPUT_CHANS (2)

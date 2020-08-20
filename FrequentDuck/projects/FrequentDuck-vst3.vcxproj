@@ -339,6 +339,7 @@
     <ClInclude Include="..\..\iPlug2\IPlug\VST3\IPlugVST3_ProcessorBase.h" />
     <ClInclude Include="..\..\iPlug2\IPlug\VST3\IPlugVST3_View.h" />
     <ClInclude Include="..\BlockSizeFixer.h" />
+    <ClInclude Include="..\EqGraph.h" />
     <ClInclude Include="..\FrequentDuck.h" />
     <ClInclude Include="..\resources\resource.h" />
   </ItemGroup>
@@ -427,6 +428,7 @@
     <ClCompile Include="..\..\iPlug2\IPlug\VST3\IPlugVST3_ProcessorBase.cpp" />
     <ClCompile Include="..\..\iPlug2\WDL\fft.c" />
     <ClCompile Include="..\BlockSizeFixer.cpp" />
+    <ClCompile Include="..\EqGraph.cpp" />
     <ClCompile Include="..\FrequentDuck.cpp" />
   </ItemGroup>
   <ItemGroup>
