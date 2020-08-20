@@ -6,8 +6,11 @@
 #define ZERO_WDL_BUF(buf, type_size) memset((buf).Get(), 0, (buf).GetSize() * (type_size))
 
 FrequentDuck::FrequentDuck(const InstanceInfo& info)
-    : Plugin(info, MakeConfig(kNumParams, kNumPresets)),
-    m_blockFixer(FFT_BLOCK_SIZE, PLUG_LATENCY, MAX_INPUT_CHANS, MAX_OUTPUT_CHANS)
+    : Plugin(info, MakeConfig(kNumParams, kNumPresets))
+#if IPLUG_DSP
+    , m_blockFixer(FFT_BLOCK_SIZE, PLUG_LATENCY, MAX_INPUT_CHANS, MAX_OUTPUT_CHANS)
+    , m_senderData(kCtrlEqMain, 2, 0)
+#endif
 {
     GetParam(kGain)->InitDouble("Gain", 0., 0., 100.0, 0.01, "%");
 
@@ -42,6 +45,8 @@ void FrequentDuck::buildGui(IGraphics& ui)
     const IRECT b = ui.GetBounds();
     ui.AttachControl(new ITextControl(b.GetMidVPadded(50), "Hello iPlug 2!", IText(50)));
     ui.AttachControl(new IVKnobControl(b.GetCentredInside(100).GetVShifted(-100), kGain));
+    //ui.AttachControl(new EqGraph<GUI_FREQ_BUF_SIZE>(IRECT(50, 400, b.R - 50, 580)), kCtrlEqMain);
+    ui.AttachControl(new EqGraph<FFT_BLOCK_SIZE>(IRECT(50, 400, b.R - 50, 580)), kCtrlEqMain);
 }
 #endif
 
@@ -54,9 +59,20 @@ void FrequentDuck::OnReset()
     m_blockFixer.reset();
 #endif
 
+    WDL_String msg;
+    msg.Append("FFT Permute: ");
+    for (int i = 0; i < FFT_BLOCK_SIZE; i++) {
+        msg.AppendFormatted(10, "%d, ", WDL_fft_permute(FFT_BLOCK_SIZE, i));
+    }
+    DBGMSG("%s", msg.Get());
 }
 
 #if IPLUG_DSP
+void FrequentDuck::OnIdle()
+{
+    m_sender.TransmitData(*this);
+}
+
 void FrequentDuck::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 {
     const int nChansIn = NInChansConnected();
@@ -110,11 +126,28 @@ void FrequentDuck::ProcessFFT(sample** inputs, sample** outputs, int nFrames)
         }
 #undef TMP
 
+        // Send freq data to the GUI
+        memcpy(m_senderData.vals[c].data(), bufMain, FFT_BLOCK_SIZE * sizeof(WDL_FFT_COMPLEX));
+/*
+        const float* freqBufIn = reinterpret_cast<float*>(bufMain);
+        const int* permuteTable = WDL_fft_permute_tab(FFT_BLOCK_SIZE);
+        float* freqBufOut = m_senderData.vals[c].data();
+#define TMP(i) abs(freqBufIn[(i)])
+        for (int i = 0; i < GUI_FREQ_BUF_SIZE; i += 2) {
+            static_assert(FFT_BLOCK_SIZE / GUI_FREQ_BUF_SIZE == 4, "Must change the number of arguments min/max calls");
+            auto mm = std::minmax({ TMP(i+0), TMP(i+1), TMP(i+2), TMP(i+3), });
+            freqBufOut[i + 0] = mm.first;
+            freqBufOut[i + 1] = mm.second;
+        }
+#undef TMP
+*/
         // Reverse the process and write to output buf.
         WDL_fft(bufMain, FFT_BLOCK_SIZE, true);
         for (int i = 0; i < FFT_BLOCK_SIZE; i++) {
             bufOut[i] = (sample)(bufMain[i].re);
         }
     }
+
+    m_sender.PushData(m_senderData);
 }
 #endif

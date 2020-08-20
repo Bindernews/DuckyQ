@@ -58,3 +58,4 @@
 #define FFT_BLOCK_SIZE (1024)
 #define MAX_INPUT_CHANS (4)
 #define MAX_OUTPUT_CHANS (2)
+#define GUI_FREQ_BUF_SIZE (256)

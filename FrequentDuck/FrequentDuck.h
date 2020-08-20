@@ -3,8 +3,16 @@
 #include "IPlug_include_in_plug_hdr.h"
 #include "BlockSizeFixer.h"
 #include "fft.h"
+#include "ISender.h"
 
 const int kNumPresets = 1;
+
+enum EControls
+{
+    kCtrlPanel = 0,
+    kCtrlEqMain,
+    kNumControls,
+};
 
 enum EParams
 {
@@ -22,6 +30,7 @@ public:
 
 #if IPLUG_EDITOR
     void buildGui(IGraphics& ui);
+    void OnIdle() override;
 #endif
 
     // Common
@@ -34,5 +43,10 @@ public:
 
     WDL_TypedBuf<WDL_FFT_COMPLEX> m_fftBuf[MAX_INPUT_CHANS];
     BlockSizeFixer m_blockFixer;
+
+    using SendArrayT = std::array<WDL_FFT_COMPLEX, FFT_BLOCK_SIZE>;
+    //using SendArrayT = std::array<float, GUI_FREQ_BUF_SIZE>;
+    ISenderData<MAX_OUTPUT_CHANS, SendArrayT> m_senderData;
+    ISender<MAX_OUTPUT_CHANS, 64, SendArrayT> m_sender;
 #endif
 };
