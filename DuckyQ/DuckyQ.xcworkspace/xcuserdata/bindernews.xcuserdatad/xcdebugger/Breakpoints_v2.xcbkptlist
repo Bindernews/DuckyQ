@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "58347B69-0FCC-4F84-939F-A98D69C24A5A"
+   type = "0"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9E818C11-79A0-45E3-A919-9165B281F17F"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "EqGraph.h"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "106"
+            endingLineNumber = "106"
+            landmarkName = "DrawGraph(g)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F1620360-0AAC-47B7-9301-5FA4FE82844D"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DuckyQ.cpp"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "98"
+            endingLineNumber = "98"
+            landmarkName = "DuckyQ::ProcessFFT(inputs, outputs, nFrames)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "FDB392F6-F177-4DDA-ADE6-646A1BB6195F"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../iPlug2/IPlug/IPlugQueue.h"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "61"
+            endingLineNumber = "61"
+            landmarkName = "Push(item)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "FDB392F6-F177-4DDA-ADE6-646A1BB6195F - 73fdb73ee5dd9dcc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "iplug::IPlugQueue&lt;iplug::IMidiMsg&gt;::Push(iplug::IMidiMsg const&amp;)"
+                  moduleName = "DuckyQ"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/bindernews/Projects/DuckyQ/iPlug2/IPlug/IPlugQueue.h"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "61"
+                  endingLineNumber = "61"
+                  offsetFromSymbolStart = "112">
+               </Location>
+               <Location
+                  uuid = "FDB392F6-F177-4DDA-ADE6-646A1BB6195F - 5c4b7c07550cba79"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "iplug::IPlugQueue&lt;iplug::SysExData&gt;::Push(iplug::SysExData const&amp;)"
+                  moduleName = "DuckyQ"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/bindernews/Projects/DuckyQ/iPlug2/IPlug/IPlugQueue.h"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "61"
+                  endingLineNumber = "61"
+                  offsetFromSymbolStart = "112">
+               </Location>
+               <Location
+                  uuid = "FDB392F6-F177-4DDA-ADE6-646A1BB6195F - ab7a59043f589161"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "iplug::IPlugQueue&lt;iplug::igraphics::ISenderData&lt;2, std::__1::array&lt;WDL_FFT_COMPLEX, 4096ul&gt; &gt; &gt;::Push(iplug::igraphics::ISenderData&lt;2, std::__1::array&lt;WDL_FFT_COMPLEX, 4096ul&gt; &gt; const&amp;)"
+                  moduleName = "DuckyQ"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/bindernews/Projects/DuckyQ/iPlug2/IPlug/IPlugQueue.h"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "61"
+                  endingLineNumber = "61"
+                  offsetFromSymbolStart = "112">
+               </Location>
+               <Location
+                  uuid = "FDB392F6-F177-4DDA-ADE6-646A1BB6195F - 78bbcb111a274139"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "iplug::IPlugQueue&lt;iplug::ParamTuple&gt;::Push(iplug::ParamTuple const&amp;)"
+                  moduleName = "DuckyQ"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/bindernews/Projects/DuckyQ/iPlug2/IPlug/IPlugQueue.h"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "61"
+                  endingLineNumber = "61"
+                  offsetFromSymbolStart = "112">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>
