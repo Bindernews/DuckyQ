@@ -25,7 +25,8 @@ void BlockSizeFixer::process(sample** inputs, sample** outputs, int inChans, int
         // Copy output buffer to real output
         const size_t szOut = std::min(nFrames - outOffset, m_blockSize - m_outPos);
         for (int c = 0; c < outChans; c++) {
-            memcpy(outputs[c] + outOffset, m_ioBufs[c + m_inChans].Get() + m_outPos, szOut * sizeof(sample));
+            size_t c_idx = c + m_inChans;
+            memcpy(outputs[c] + outOffset, m_ioBufs[c_idx].Get() + m_outPos, szOut * sizeof(sample));
         }
         outOffset += szOut;
         m_outPos += szOut;
@@ -77,6 +78,14 @@ void BlockSizeFixer::reset()
     }
     m_inPos = 0;
     m_outPos = 0;
+}
+
+void BlockSizeFixer::setBlockSize(int blockSize)
+{
+    m_blockSize = blockSize;
+    for (int i = 0; i < m_ioBufs.size(); i++) {
+        m_ioBufs[i].Resize(m_blockSize * sizeof(sample));
+    }
 }
 
 bool BlockSizeFixer::isNewBlock() const

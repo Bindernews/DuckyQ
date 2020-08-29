@@ -24,6 +24,10 @@ public:
         m_processFixed = cb;
     }
 
+
+    void setBlockSize(int blockSize);
+    void setLatency(int latency);
+
     bool isNewBlock() const;
     
 

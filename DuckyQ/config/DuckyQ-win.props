@@ -7,6 +7,8 @@
     <EXTRA_DEBUG_DEFS />
     <EXTRA_RELEASE_DEFS />
     <EXTRA_TRACER_DEFS />
+    <VST2_SDK>D:\Libraries\VST_SDK\VST2_SDK</VST2_SDK>
+    <VST3_SDK>D:\Libraries\VST_SDK\VST3_SDK</VST3_SDK>
     <PDB_FILE>$(SolutionDir)build-win\pdbs\$(TargetName)_$(Platform).pdb</PDB_FILE>
     <BUILD_DIR>$(SolutionDir)build-win</BUILD_DIR>
     <CREATE_BUNDLE_SCRIPT>$(IPLUG2_ROOT)\Scripts\create_bundle.bat</CREATE_BUNDLE_SCRIPT>

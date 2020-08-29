@@ -1,8 +1,9 @@
 #include "DuckyQ.h"
 #include "IPlug_include_in_plug_src.h"
-#include "IControls.h"
-#include "EqGraph.h"
 
+#if IPLUG_EDITOR
+#include "gui.h"
+#endif
 
 #define ZERO_WDL_BUF(buf, type_size) memset((buf).Get(), 0, (buf).GetSize() * (type_size))
 
@@ -10,64 +11,82 @@ DuckyQ::DuckyQ(const InstanceInfo& info)
     : Plugin(info, MakeConfig(kNumParams, kNumPresets))
 #if IPLUG_DSP
     , m_blockFixer(FFT_BLOCK_SIZE, PLUG_LATENCY, MAX_INPUT_CHANS, MAX_OUTPUT_CHANS)
-    , m_senderData(kCtrlEqMain, 2, 0)
+    , m_hasSidechain(false)
+    , m_fftBlockSize(0)
+    , m_graphMessage(kCtrlEqMain, 0)
+    , m_sender(64)
 #endif
 {
     GetParam(kGain)->InitDouble("Gain", 0., 0., 100.0, 0.01, "%");
 
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
+    m_gui = new PlugGUI(*this);
+
     mMakeGraphicsFunc = [&]() {
         return MakeGraphics(*this, PLUG_WIDTH, PLUG_HEIGHT, PLUG_FPS, GetScaleForScreen(PLUG_HEIGHT));
     };
   
-    mLayoutFunc = [&](IGraphics* pGraphics) { buildGui(*pGraphics); };
+    mLayoutFunc = [&](IGraphics* pGraphics) { m_gui->buildGui(*pGraphics); };
 #endif
 
 #if IPLUG_DSP
-    WDL_fft_init();
+    // Setup any extra variables that we can't setup in the init section.
 
-    // Resize our buffers.
-    for (int i = 0; i < MAX_INPUT_CHANS; i++) {
-        m_fftBuf[i].Resize(FFT_BLOCK_SIZE);
-    }
+    // Init FFT data
+    WDL_fft_init();
+    // Setup FFT buffers
+    setFFTSize(FFT_BLOCK_SIZE);
 
     m_blockFixer.setCallback([=](sample** inputs, sample** outputs, int nFrames) {
         this->ProcessFFT(inputs, outputs, nFrames);
     });
-    
-    m_hasSidechain = false;
 #endif
 }
+
+DuckyQ::~DuckyQ()
+{
+#if IPLUG_EDITOR
+    delete m_gui;
+#endif
+}
+
+bool DuckyQ::OnMessage(int msgTag, int ctrlTag, int dataSize, const void* data)
+{
+    bn::QMsg msg{ data, dataSize };
+
+#if IPLUG_DSP
+    switch (msgTag) {
+    case kMsgdFFTSize:
+    {
+        setFFTSize(msg.buffer<int>()[0]);
+        return true;
+    }
+    }
+#endif
 
 #if IPLUG_EDITOR
-void DuckyQ::buildGui(IGraphics& ui)
-{
-    ui.AttachCornerResizer(EUIResizerMode::Scale, false);
-    ui.AttachPanelBackground(COLOR_GRAY);
-    ui.LoadFont("Roboto-Regular", ROBOTO_FN);
-    const IRECT b = ui.GetBounds();
-    ui.AttachControl(new ITextControl(b.GetMidVPadded(50), "Hello iPlug 2!", IText(50)));
-    ui.AttachControl(new IVKnobControl(b.GetCentredInside(100).GetVShifted(-100), kGain));
-    //ui.AttachControl(new EqGraph<GUI_FREQ_BUF_SIZE>(IRECT(50, 400, b.R - 50, 580)), kCtrlEqMain);
-    ui.AttachControl(new EqGraph<FFT_BLOCK_SIZE>(IRECT(50, 400, b.R - 50, 580)), kCtrlEqMain);
-}
+    if (m_gui->OnMessage(msgTag, ctrlTag, msg)) {
+        return true;
+    }
 #endif
+    return false;
+}
 
+#if IPLUG_DSP
 void DuckyQ::OnReset()
 {
-#if IPLUG_DSP
     for (int i = 0; i < MAX_INPUT_CHANS; i++) {
+        m_fftBuf[i].Resize(m_fftBlockSize);
         ZERO_WDL_BUF(m_fftBuf[i], sizeof(WDL_FFT_COMPLEX));
     }
     m_blockFixer.reset();
-    
+    m_graphMessage.resize(sizeof(WDL_FFT_COMPLEX) * m_fftBlockSize * NOutChansConnected());
+
     m_hasSidechain = NOutChansConnected() > NInChansConnected();
-    
-    //DBGMSG("IO Config: In: %d  Out: %d\n", NInChansConnected(), NOutChansConnected());
-#endif
+
+    DBGMSG("IO Config: In: %d  Out: %d\n", NInChansConnected(), NOutChansConnected());
 }
 
-#if IPLUG_DSP
 void DuckyQ::OnIdle()
 {
     m_sender.TransmitData(*this);
@@ -83,28 +102,32 @@ void DuckyQ::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 
 inline static float signf(float v)
 {
+    return std::signbit(v) ? -1.f : 1.f;
 }
 
 void DuckyQ::ProcessFFT(sample** inputs, sample** outputs, int nFrames)
 {
     const int nChansOut = NOutChansConnected();
+    const int bufferSize = m_fftBlockSize * sizeof(WDL_FFT_COMPLEX);
+
+    // Make sure we have enough space in our graph message buffer.
+    // If the buffer is already large enough, nothing will happen.
+    m_graphMessage.resize(bufferSize * nChansOut);
 
     // Reduce volume of main inputs by volume of side inputs
     // Index of the side input is main input index + nChansOut
     for (int c = 0; c < nChansOut; c++) {
         auto inMain = inputs[c];
         auto bufMain = m_fftBuf[c].Get();
-        copyToFFT(bufMain, inMain, FFT_BLOCK_SIZE);
-        WDL_fft(bufMain, FFT_BLOCK_SIZE, false);
-        
-        memcpy(m_senderData.vals[c].data(), bufMain, FFT_BLOCK_SIZE * sizeof(WDL_FFT_COMPLEX));
+        copyToFFT(bufMain, inMain, m_fftBlockSize);
+        WDL_fft(bufMain, m_fftBlockSize, false);
         
         // Only do sidechain if it's enabled
         if (m_hasSidechain) {
             auto inSide = inputs[c + nChansOut];
             auto bufSide = m_fftBuf[c + nChansOut].Get();
-            copyToFFT(bufSide, inSide, FFT_BLOCK_SIZE);
-            WDL_fft(bufSide, FFT_BLOCK_SIZE, false);
+            copyToFFT(bufSide, inSide, m_fftBlockSize);
+            WDL_fft(bufSide, m_fftBlockSize, false);
             
             #define TMP(m, s) (m) = signf(m) * (abs(m) - std::min(abs(s), abs(m)))
             for (int i = 0; i < FFT_BLOCK_SIZE; i++) {
@@ -115,18 +138,30 @@ void DuckyQ::ProcessFFT(sample** inputs, sample** outputs, int nFrames)
         }
         
         // Send freq data to the GUI
-        //memcpy(m_senderData.vals[c].data(), bufMain, FFT_BLOCK_SIZE * sizeof(WDL_FFT_COMPLEX));
+        memcpy(m_graphMessage.buffer<uint8_t>() + (bufferSize * c), bufMain, bufferSize);
 
         // Reverse the process and write to output buf.
         auto bufOut = outputs[c];
-        WDL_fft(bufMain, FFT_BLOCK_SIZE, true);
+        WDL_fft(bufMain, m_fftBlockSize, true);
         for (int i = 0; i < FFT_BLOCK_SIZE; i++) {
             bufOut[i] = (sample)(bufMain[i].re);
         }
     }
     
     if (m_blockFixer.isNewBlock() || true) {
-        m_sender.PushData(m_senderData);
+        m_sender.PushData(m_graphMessage);
+    }
+}
+
+void DuckyQ::setFFTSize(int fftSize)
+{
+    m_fftBlockSize = fftSize;
+    m_blockFixer.setBlockSize(fftSize);
+    m_graphMessage.resize(sizeof(WDL_FFT_COMPLEX) * m_fftBlockSize * NOutChansConnected());
+
+    // Resize buffers.
+    for (int i = 0; i < MAX_INPUT_CHANS; i++) {
+        m_fftBuf[i].Resize(m_fftBlockSize);
     }
 }
 

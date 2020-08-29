@@ -59,3 +59,4 @@
 #define MAX_INPUT_CHANS (4)
 #define MAX_OUTPUT_CHANS (2)
 #define GUI_FREQ_BUF_SIZE (256)
+#define MAX_EQ_BANDS (16)
